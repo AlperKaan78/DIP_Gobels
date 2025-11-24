@@ -3,7 +3,7 @@ import cv2
 from ofd1 import *
 
 def main():
-    cam = cv2.VideoCapture("data/mobese_3.mp4")
+    cam = cv2.VideoCapture("../data/mobese_3.mp4")
     p = int(cam.get(3))
     l = int(cam.get(4))
 
@@ -26,10 +26,6 @@ def main():
     kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
     
-    # VideoWriter
-    out = cv2.VideoWriter('result_merged.avi',
-                         cv2.VideoWriter_fourcc('M','J','P','G'), 
-                         30, (p,l))
     
     # ========== BİRLEŞTİRME YÖNTEMİ SEÇİN ==========
     merge_method = "and"  # "or", "and", "weighted"
@@ -56,7 +52,7 @@ def main():
         # ========== 2. OPTICAL FLOW ==========
         flow = cv2.calcOpticalFlowFarneback(
             prevgray, gray, None, 
-            0.5, 3, 15, 3, 5, 1.1, 0
+            0.5, 3, 7, 3, 5, 1.1, 0
         )
         prevgray = gray
         
@@ -125,10 +121,8 @@ def main():
         #cv2.imshow('3. Flow Mask', thresh_flow)
         #cv2.imshow('4. MERGED Mask', merged_mask)
         cv2.imshow('5. Final Detection', img_result)
-        #cv2.imshow('6. Optical Flow HSV', draw_hsv(flow))
-        
-        out.write(img_result)
-        
+        cv2.imshow('6. Optical Flow HSV', draw_hsv(flow))
+                
         if frame_count % 30 == 0:
             print(f"Frame {frame_count} - Method: {method_name}")
         
@@ -146,7 +140,6 @@ def main():
             print("Switched to WEIGHTED method")
 
     cam.release()
-    out.release()
     cv2.destroyAllWindows()
     print(f"Toplam {frame_count} frame işlendi.")
 
