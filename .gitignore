@@ -1,1 +1,84 @@
 furkan/
+
+# ============================================================
+# Python
+# ============================================================
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# C extensions
+*.so
+
+# Distribution / packaging
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# Virtual environments
+venv/
+env/
+ENV/
+dip_env/
+.venv
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# ============================================================
+# Project Specific
+# ============================================================
+
+# # Video files (TOO LARGE for GitHub!)
+# Data/*.mp4
+# Data/*.avi
+# Data/*.mov
+# Data/*.mkv
+
+# # Output videos
+# outputs/*.avi
+# outputs/*.mp4
+# outputs/*.mov
+
+# # Keep Data directory structure
+# !Data/.gitkeep
+
+# # Keep outputs directory structure  
+# !outputs/.gitkeep
+
+# Temporary files
+*.tmp
+*.log
+
+# OS specific
+.DS_Store
+Thumbs.db
+
+# Jupyter Notebooks
+.ipynb_checkpoints/
+*.ipynb
+
+# ============================================================
+# Optional: Keep sample images
+# ============================================================
+# If you want to keep small images, uncomment:
+# !Data/*.jpg
+# !Data/*.png

@@ -3,10 +3,18 @@ import numpy as np
 from matplotlib import pyplot as plt
 
 # Görüntüyü gri seviyede oku
-img = cv2.imread('data/heisenberg.jpg', cv2.IMREAD_GRAYSCALE)
+path = "Data/heisenberg.jpg"
+img = cv2.imread(path, cv2.IMREAD_GRAYSCALE)
 
 # Laplacian filtresini uygula
 laplacian = cv2.Laplacian(img, cv2.CV_64F, ksize=1)
+# Parametreler:
+#     CV_64F  → negatif değerler çıkabilir diye
+#     ksize=1 → en küçük kernel (çok hassas)
+
+# Laplacian = ikinci türev
+# Yoğunluğun hızlı değiştiği yerler → kenar
+# Düz alanlar → 0’a yakın
 
 # Negatif değerleri 0-255 aralığına getir
 laplacian = cv2.convertScaleAbs(laplacian)

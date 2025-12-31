@@ -3,7 +3,9 @@ import numpy as np
 
 def test_mog2():
     # Video aç
-    cam = cv2.VideoCapture("data/atrium.avi")
+    # path_of_video = "Data/atrium.avi"
+    path_of_video = "Data/mobese_3.mp4"
+    cam = cv2.VideoCapture(path_of_video)
     
     if not cam.isOpened():
         print("HATA: Video açılamadı!")
@@ -11,9 +13,9 @@ def test_mog2():
         return
     
     # Video bilgilerini al
-    width = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
+    width  = int(cam.get(cv2.CAP_PROP_FRAME_WIDTH))
     height = int(cam.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = int(cam.get(cv2.CAP_PROP_FPS))
+    fps    = int(cam.get(cv2.CAP_PROP_FPS))
     total_frames = int(cam.get(cv2.CAP_PROP_FRAME_COUNT))
     
     print("=" * 50)
@@ -54,11 +56,11 @@ def test_mog2():
             fg_mask_no_shadow = cv2.threshold(fg_mask, 200, 255, cv2.THRESH_BINARY)[1]
             
             # Gürültü temizleme
-            kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+            kernel_open  = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
             kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (9, 9))
             
-            fg_mask_clean = cv2.morphologyEx(fg_mask_no_shadow, cv2.MORPH_OPEN, kernel_open)
-            fg_mask_clean = cv2.morphologyEx(fg_mask_clean, cv2.MORPH_CLOSE, kernel_close)
+            fg_mask_clean = cv2.morphologyEx(fg_mask_no_shadow, cv2.MORPH_OPEN,  kernel_open)
+            fg_mask_clean = cv2.morphologyEx(fg_mask_clean,     cv2.MORPH_CLOSE, kernel_close)
             
             # Arka plan modelini al (opsiyonel)
             bg_image = mog2_subtractor.getBackgroundImage()
@@ -78,23 +80,24 @@ def test_mog2():
             
             # Her 30 frame'de konsola bilgi yazdır
             if frame_count % 30 == 0:
-                print(f"İşlenen frame: {frame_count}/{total_frames} "
+                print(f"Frame processed: {frame_count}/{total_frames} "
                       f"(%{int(frame_count/total_frames*100)})")
         
         # Klavye kontrolü
         key = cv2.waitKey(30) & 0xff
         
         if key == 27:  # ESC
-            print("\nKullanıcı tarafından durduruldu.")
+            print("\nHalted by user!")
             break
         elif key == 32:  # SPACE
             paused = not paused
-            print("DURAKLATILDI" if paused else "DEVAM EDİYOR")
+            print("HALTED" if paused else "DEVAM EDİYOR")
     
     cam.release()
     cv2.destroyAllWindows()
-    print(f"\nTest tamamlandı!")
-    print(f"Toplam {frame_count} frame işlendi.")
+    print(f"\nTest is done!")
+    print(f"Total {frame_count} frame was processed.")
+
 
 if __name__ == "__main__":
     test_mog2()

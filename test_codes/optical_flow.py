@@ -10,7 +10,7 @@ import cv2
 import numpy as np
 from skimage.feature import corner_harris, corner_shi_tomasi, peak_local_max
 from skimage import transform as tf
-from scipy import signal
+# from scipy import signal
 
 # ===================== 1. FEATURE DETECTION =====================
 def getFeatures(img, bbox, use_shi=False):
@@ -95,7 +95,7 @@ def interp2(v, xq, yq):
 
 # ===================== 3. OPTICAL FLOW =====================
 def estimateFeatureTranslation(startX, startY, Ix, Iy, img1, img2):
-    """Lucas-Kanade optik akış ile özellik noktasının yeni konumunu hesaplar"""
+    """Lucas-Kanade optik flow ile özellik noktasının yeni konumunu hesaplar"""
     X = startX
     Y = startY
     
@@ -129,7 +129,7 @@ def estimateFeatureTranslation(startX, startY, Ix, Iy, img1, img2):
     return X, Y
 
 def estimateAllTranslation(startXs, startYs, img1, img2):
-    """Tüm özellik noktaları için optik akış hesaplar"""
+    """Tüm feature noktaları için optik flow hesaplar"""
     I = cv2.cvtColor(img1, cv2.COLOR_RGB2GRAY)
     I = cv2.GaussianBlur(I, (5, 5), 0.2)
     Iy, Ix = np.gradient(I.astype(float))
@@ -204,7 +204,7 @@ def optical_flow_tracking(video_path, n_frames=100, draw_bb=True):
     cap = cv2.VideoCapture(video_path)
     
     if not cap.isOpened():
-        print("❌ Video açılamadı!")
+        print("❌ Video can not be opened!")
         return
     
     # İlk frame'i oku
@@ -264,7 +264,7 @@ def optical_flow_tracking(video_path, n_frames=100, draw_bb=True):
             print(f"\n⚠️  Video sonu ({frame_idx}. frame'de)")
             break
         
-        # Optik akış ile yeni pozisyonları hesapla
+        # Optik flow ile yeni pozisyonları hesapla
         newXs, newYs = estimateAllTranslation(startXs, startYs, prev_frame, curr_frame)
         
         # Geometrik dönüşüm uygula
@@ -332,7 +332,7 @@ if __name__ == "__main__":
     print("   3. 'q' tuşu ile çıkış yapın\n")
     
     # Video yolunu buraya yazın
-    video_path = "furkan/video.mp4"  # BURAYA KENDİ VİDEONUZU YAZIN
+    video_path = "Data/video.mp4"
     
     # Örnek videolar için:
     # video_path = 0  # Webcam için
@@ -342,7 +342,7 @@ if __name__ == "__main__":
         optical_flow_tracking(
             video_path=video_path,
             n_frames=200,      # İşlenecek frame sayısı
-            draw_bb=True       # Manuel nesne seçimi
+            draw_bb=False       # Manuel nesne seçimi
         )
     except Exception as e:
         print(f"\n❌ HATA: {e}")

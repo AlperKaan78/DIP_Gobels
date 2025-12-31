@@ -2,7 +2,8 @@ import numpy as np
 import cv2
 
 def main():
-    cam = cv2.VideoCapture("furkan/video.mp4")
+    path = "Data/video.mp4"
+    cam = cv2.VideoCapture(path)
     if not cam.isOpened():
         print("Video açılamadı!")
         return
@@ -18,7 +19,7 @@ def main():
     )
 
     # Morfolojik filtreler
-    kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
+    kernel_open  = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (7, 7))
     kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
 
     out = cv2.VideoWriter(
@@ -42,9 +43,7 @@ def main():
         fg_mask = backSub.apply(frame)
 
         # Gölge temizleme (gölge = 127 civarı)
-        fg_mask_no_shadow = cv2.threshold(
-            fg_mask, 200, 255, cv2.THRESH_BINARY
-        )[1]
+        fg_mask_no_shadow = cv2.threshold(fg_mask, 200, 255, cv2.THRESH_BINARY)[1]
 
         # ========== 2. Gürültü Temizleme ==========
         fg_mask_clean = cv2.morphologyEx(
@@ -108,6 +107,7 @@ def main():
     out.release()
     cv2.destroyAllWindows()
     print("Tamamlandı.")
+
 
 if __name__ == "__main__":
     main()

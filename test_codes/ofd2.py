@@ -3,7 +3,7 @@ import cv2
 from ofd1 import *
 
 def main():
-    cam = cv2.VideoCapture("../data/mobese_3.mp4")
+    cam = cv2.VideoCapture("Data/mobese_3.mp4")
     p = int(cam.get(3))
     l = int(cam.get(4))
 
@@ -15,20 +15,22 @@ def main():
    
     prevgray = cv2.cvtColor(prev, cv2.COLOR_BGR2GRAY)
     
-    # MOG2
+    # MOG2 (Background Subtractor)
     backSub = cv2.createBackgroundSubtractorMOG2(
         history=500,
         varThreshold=16,
         detectShadows=True
     )
+    # Buradaki amaç: 
+    # Sahnenin arka plan modelini öğrenmek,
+    # Hareketli her şeyi foreground olarak işaretlemek
     
     # Kerneller
-    kernel_open = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
+    kernel_open  = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (3, 3))
     kernel_close = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (11, 11))
-    
-    
+        
     # ========== BİRLEŞTİRME YÖNTEMİ SEÇİN ==========
-    merge_method = "and"  # "or", "and", "weighted"
+    merge_method = "weighted"  # "or", "and", "weighted"
     # ==============================================
     
     frame_count = 0
@@ -46,10 +48,14 @@ def main():
         # ========== 1. MOG2 ==========
         fg_mask = backSub.apply(img)
         fg_mask_no_shadow = cv2.threshold(fg_mask, 200, 255, cv2.THRESH_BINARY)[1]
-        fg_mask_clean = cv2.morphologyEx(fg_mask_no_shadow, cv2.MORPH_OPEN, kernel_open)
-        fg_mask_clean = cv2.morphologyEx(fg_mask_clean, cv2.MORPH_CLOSE, kernel_close)
+        fg_mask_clean = cv2.morphologyEx(fg_mask_no_shadow, cv2.MORPH_OPEN,  kernel_open)
+        fg_mask_clean = cv2.morphologyEx(fg_mask_clean,     cv2.MORPH_CLOSE, kernel_close)
         
-        # ========== 2. OPTICAL FLOW ==========
+        # OPEN  → küçük gürültüyü sil
+        # CLOSE → nesne içindeki boşlukları doldur
+
+        # ========== 2. OPTICAL FLOW ========== 
+        # Her piksel için hareket vektörü elde edilir
         flow = cv2.calcOpticalFlowFarneback(
             prevgray, gray, None, 
             0.5, 3, 7, 3, 5, 1.1, 0
@@ -59,7 +65,8 @@ def main():
         gray1 = cv2.cvtColor(draw_hsv(flow), cv2.COLOR_BGR2GRAY)
         thresh_flow = cv2.threshold(gray1, 3, 255, cv2.THRESH_BINARY)[1]
         thresh_flow = cv2.dilate(thresh_flow, None, iterations=2)
-        
+        # thresh_flow = "Gerçekten hareket eden pikseller"
+
         # ========== 3. BİRLEŞTİRME ==========
         if merge_method == "or":
             # YÖNTEM 1: OR (Birleşim)
@@ -116,12 +123,12 @@ def main():
         cv2.putText(img_result, f"Frame: {frame_count}", (10, 60),
                    cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 255), 2)
         
-        #cv2.imshow('1. Original', img)
-        #cv2.imshow('2. MOG2 Mask', fg_mask_clean)
-        #cv2.imshow('3. Flow Mask', thresh_flow)
-        #cv2.imshow('4. MERGED Mask', merged_mask)
-        cv2.imshow('5. Final Detection', img_result)
-        cv2.imshow('6. Optical Flow HSV', draw_hsv(flow))
+        cv2.imshow('1. Original', img)
+        cv2.imshow('2. MOG2 Mask', fg_mask_clean)
+        cv2.imshow('3. Flow Mask', thresh_flow)
+        cv2.imshow('4. MERGED Mask', merged_mask)
+        # cv2.imshow('5. Final Detection', img_result)
+        # cv2.imshow('6. Optical Flow HSV', draw_hsv(flow))
                 
         if frame_count % 30 == 0:
             print(f"Frame {frame_count} - Method: {method_name}")
@@ -142,6 +149,7 @@ def main():
     cam.release()
     cv2.destroyAllWindows()
     print(f"Toplam {frame_count} frame işlendi.")
+
 
 if __name__ == "__main__":
     main()
